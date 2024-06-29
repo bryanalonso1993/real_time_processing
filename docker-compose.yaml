@@ -1,0 +1,150 @@
+---
+version: '3.7'
+services:
+  # Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      net_deployment:
+        ipv4_address: 172.27.1.36
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    networks:
+      net_deployment:
+        ipv4_address: 172.27.1.35
+  # Base de datos
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: Changeme123
+      MYSQL_DATABASE: netflix
+      TZ: America/Lima
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      net_deployment:
+        ipv4_address: 172.27.1.30
+  # CDC Kafka
+  debezium:
+    image: debezium/connect:latest
+    container_name: debezium
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: debezium_config
+      OFFSET_STORAGE_TOPIC: debezium_offset
+      STATUS_STORAGE_TOPIC: debezium_status
+      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_REST_ADVERTISED_HOST_NAME: debezium
+      CONNECT_REST_PORT: 8083
+      CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+    ports:
+      - "8083:8083"
+    depends_on:
+      - kafka
+      - mysql
+    networks:
+      net_deployment:
+        ipv4_address: 172.27.1.14
+  # WebUI Kafka
+  akhq:
+    image: tchiotludo/akhq:latest
+    container_name: ui-kafka
+    depends_on:
+     - kafka
+    ports:
+      - "8080:8080"
+    environment:
+      AKHQ_CONFIGURATION: | 
+        akhq:
+          connections:
+            docker-kafka:
+              properties:
+                bootstrap.servers: "kafka:9092"
+    networks:
+      net_deployment:
+        ipv4_address: 172.27.1.15
+  # jupyter
+  jupyter:
+    image: jupyter/minimal-notebook:latest
+    container_name: jupyter-notebook
+    volumes:
+      - jupyter_storage:/work
+      - ./dumps:/work
+    ports:
+      - "8888:8888"
+    networks:
+      net_deployment:
+        ipv4_address: 172.27.1.20
+  # Apache Spark
+  spark-master:
+    image: apache-spark:v1
+    container_name: spark-master
+    ports:
+      - "9090:8080"
+      - "7077:7077"
+    volumes:
+      - ./spark-apps:/opt/spark-apps
+      - ./spark-data:/opt/spark-data
+    environment:
+      - SPARK_LOCAL_IP=spark-master
+      - SPARK_WORKLOAD=master
+    networks:
+      net_deployment:
+        ipv4_address: 172.27.1.10
+  spark-worker:
+    image: apache-spark:v1
+    container_name: spark-worker
+    ports:
+      - "9091:8080"
+      - "7078:7077"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+    networks:
+      net_deployment:
+        ipv4_address: 172.27.1.11
+volumes:
+  mysql_data:
+    driver: local
+  jupyter_storage:
+    driver: local
+networks:
+  net_deployment:
+    ipam:
+      driver: default
+      config:
+        - subnet: 127.27.0.0/16
