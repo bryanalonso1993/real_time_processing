@@ -39,6 +39,7 @@ services:
       TZ: America/Lima
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./dumps/init.sql:/init.sql
     ports:
       - "3306:3306"
     networks:
