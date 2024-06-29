@@ -1,5 +1,5 @@
 ---
-version: '3.7'
+version: '3'
 services:
   # Zookeeper
   zookeeper:
@@ -93,7 +93,6 @@ services:
     container_name: jupyter-notebook
     volumes:
       - jupyter_storage:/work
-      - ./dumps:/work
     ports:
       - "8888:8888"
     networks:
@@ -114,7 +113,7 @@ services:
       - SPARK_WORKLOAD=master
     networks:
       net_deployment:
-        ipv4_address: 172.27.1.10
+        ipv4_address: 172.27.1.155
   spark-worker:
     image: apache-spark:v1
     container_name: spark-worker
@@ -132,8 +131,8 @@ services:
       - SPARK_WORKLOAD=worker
       - SPARK_LOCAL_IP=spark-worker
     volumes:
-      - ./apps:/opt/spark-apps
-      - ./data:/opt/spark-data
+      - ./spark-apps:/opt/spark-apps
+      - ./spark-data:/opt/spark-data
     networks:
       net_deployment:
         ipv4_address: 172.27.1.11
@@ -147,4 +146,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 127.27.0.0/16
+        - subnet: 172.27.0.0/16
