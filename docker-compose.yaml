@@ -35,7 +35,7 @@ services:
     container_name: mysql-container
     environment:
       MYSQL_ROOT_PASSWORD: Changeme123
-      MYSQL_DATABASE: netflix
+      MYSQL_DATABASE: datapath
       TZ: America/Lima
     volumes:
       - mysql_data:/var/lib/mysql
@@ -94,6 +94,7 @@ services:
     container_name: jupyter-notebook
     volumes:
       - jupyter_storage:/work
+      - ./jupyter-notebook:/home/jovyan/work
     ports:
       - "8888:8888"
     networks:

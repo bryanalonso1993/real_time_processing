@@ -25,7 +25,11 @@ df = spark \
 
 df.show()
 
-df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)").show()
+process_json = df.selectExpr("CAST(value AS STRING)")
+
+process_json.show()
+
+print(process_json)
 
 spark.stop()
 

@@ -8,10 +8,10 @@
         "database.user": "root",
         "database.password": "Changeme123",
         "database.server.id": "184054",
-        "database.server.name": "netflix",
-        "database.include.list": "netflix",
+        "database.server.name": "datapath",
+        "database.include.list": "datapath",
         "schema.history.internal.kafka.bootstrap.servers": "kafka:9092",
-        "schema.history.internal.kafka.topic": "schema-changes.netflix",
+        "schema.history.internal.kafka.topic": "schema-changes.datapath",
         "include.schema.changes": "true",
         "topic.prefix": "oltp"
     }
