@@ -45,5 +45,20 @@ WARN[0000] /workspaces/real_time_processing/docker-compose.yaml: `version` is ob
 3) En Jupyter se encuentra el script para poblar las tablas.
 
 ```
-    
+
 ```
+
+4) Crear el conector de Debezium
+
+```
+@bryanalonso1993 ➜ /workspaces/real_time_processing (main) $ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" http://localhost:8083/connectors/ -d @register-mysql.json
+HTTP/1.1 201 Created
+Date: Sun, 30 Jun 2024 22:36:49 GMT
+Location: http://localhost:8083/connectors/mysql-connector
+Content-Type: application/json
+Content-Length: 566
+Server: Jetty(9.4.52.v20230823)
+
+{"name":"mysql-connector","config":{"connector.class":"io.debezium.connector.mysql.MySqlConnector","tasks.max":"1","database.hostname":"mysql-container","database.port":"3306","database.user":"root","database.password":"Changeme123","database.server.id":"184054","database.server.name":"datapath","database.include.list":"datapath","schema.history.internal.kafka.bootstrap.servers":"kafka:9092","schema.history.internal.kafka.topic":"schema-changes.datapath","include.schema.changes":"true","topic.prefix":"oltp","name":"mysql-connector"},"tasks":[],"type":"source"}
+```
+
