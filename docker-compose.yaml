@@ -138,6 +138,17 @@ services:
     networks:
       net_deployment:
         ipv4_address: 172.27.1.11
+  # apache airflow
+  airflow:
+    image: apache-airflow:v1
+    container_name: airflow-standalone
+    ports:
+      - "14400:8080"
+    volumes:
+      - ./airflow_dag:/opt/airflow/dags
+    networks:
+      net_deployment:
+        ipv4_address: 172.27.1.111
 volumes:
   mysql_data:
     driver: local
