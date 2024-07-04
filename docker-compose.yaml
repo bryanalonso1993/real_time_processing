@@ -7,6 +7,7 @@ services:
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
+      TZ: America/Lima
     ports:
       - "2181:2181"
     networks:
@@ -22,6 +23,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      TZ: America/Lima
     ports:
       - "9092:9092"
     depends_on:
@@ -62,6 +64,7 @@ services:
       CONNECT_REST_ADVERTISED_HOST_NAME: debezium
       CONNECT_REST_PORT: 8083
       CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+      TZ: America/Lima
     ports:
       - "8083:8083"
     depends_on:
@@ -79,6 +82,7 @@ services:
     ports:
       - "8080:8080"
     environment:
+      TZ: America/Lima
       AKHQ_CONFIGURATION: | 
         akhq:
           connections:
@@ -111,8 +115,9 @@ services:
       - ./spark-apps:/opt/spark-apps
       - ./spark-data:/opt/spark-data
     environment:
-      - SPARK_LOCAL_IP=spark-master
-      - SPARK_WORKLOAD=master
+      SPARK_LOCAL_IP: spark-master
+      SPARK_WORKLOAD: master
+      TZ: America/Lima
     networks:
       net_deployment:
         ipv4_address: 172.27.1.155
@@ -125,13 +130,14 @@ services:
     depends_on:
       - spark-master
     environment:
-      - SPARK_MASTER=spark://spark-master:7077
-      - SPARK_WORKER_CORES=1
-      - SPARK_WORKER_MEMORY=1G
-      - SPARK_DRIVER_MEMORY=1G
-      - SPARK_EXECUTOR_MEMORY=1G
-      - SPARK_WORKLOAD=worker
-      - SPARK_LOCAL_IP=spark-worker
+      SPARK_MASTER: spark://spark-master:7077
+      SPARK_WORKER_CORES: 1
+      SPARK_WORKER_MEMORY: 1G
+      SPARK_DRIVER_MEMORY: 1G
+      SPARK_EXECUTOR_MEMORY: 1G
+      SPARK_WORKLOAD: worker
+      SPARK_LOCAL_IP: spark-worker
+      TZ: America/Lima
     volumes:
       - ./spark-apps:/opt/spark-apps
       - ./spark-data:/opt/spark-data
@@ -142,6 +148,9 @@ services:
   airflow:
     image: apache-airflow:v1
     container_name: airflow-standalone
+    environment:
+      TZ: America/Lima
+    command: "airflow users create --username bryan --firstname Bryan --lastname Almeyda --email balmeyda@uni.pe --role Admin --password claro123"
     ports:
       - "14400:8080"
     volumes:
