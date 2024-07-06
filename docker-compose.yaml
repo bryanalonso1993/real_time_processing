@@ -98,7 +98,7 @@ services:
     container_name: jupyter-notebook
     volumes:
       - jupyter_storage:/work
-      - ./jupyter-notebook:/home/jovyan/work
+      - ./repository:/home/jovyan/work
     ports:
       - "8888:8888"
     networks:
@@ -150,11 +150,12 @@ services:
     container_name: airflow-standalone
     environment:
       TZ: America/Lima
-    command: "airflow users create --username bryan --firstname Bryan --lastname Almeyda --email balmeyda@uni.pe --role Admin --password claro123"
+    # command: "airflow users create --username bryan --firstname Bryan --lastname Almeyda --email balmeyda@uni.pe --role Admin --password claro123"
     ports:
       - "14400:8080"
     volumes:
       - ./airflow_dag:/opt/airflow/dags
+      - ./repository:/opt/airflow/repository
     networks:
       net_deployment:
         ipv4_address: 172.27.1.111
