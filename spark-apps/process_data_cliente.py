@@ -1,8 +1,8 @@
 #!/usr/env bin pyspark
-from pyspark.sql import SparkSession
-from datetime import datetime
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, LongType, NullType
 from pyspark.sql.functions import from_json, col
+from pyspark.sql import SparkSession
+from datetime import datetime
 
 # ./bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 /opt/spark-apps/process_data.py
 
