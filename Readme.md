@@ -110,3 +110,19 @@ Server: Jetty(9.4.52.v20230823)
 {"name":"mysql-connector","config":{"connector.class":"io.debezium.connector.mysql.MySqlConnector","tasks.max":"1","database.hostname":"mysql-container","database.port":"3306","database.user":"root","database.password":"Changeme123","database.server.id":"184054","database.server.name":"datapath","database.include.list":"datapath","schema.history.internal.kafka.bootstrap.servers":"kafka:9092","schema.history.internal.kafka.topic":"schema-changes.datapath","include.schema.changes":"true","topic.prefix":"oltp","name":"mysql-connector"},"tasks":[],"type":"source"}
 ```
  
+##### Prueba Funcional:
+
+9) Ejecutar DAG pobla la base de datos.
+
+* Producto
+<img title="Crear tabla sistema de ventas" alt="Alt text" src="./img/poblar_tabla_producto.png">
+
+* Pedido
+<img title="Crear tabla sistema de ventas" alt="Alt text" src="./img/poblar_tabla_pedido.png">
+
+10) Validar UI Kafka.
+
+<img title="Crear tabla sistema de ventas" alt="Alt text" src="./img/kafka_ui.png">
+
+11) Procesamiento en Spark
+
