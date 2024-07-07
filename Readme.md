@@ -20,29 +20,12 @@ Dockerfile  start-spark.sh
 2) Crear la imagen de apache airflow
 
 ```
-@bryanalonso1993 ➜ /workspaces/real_time_processing (main) $ cd spark_custom_image/
-@bryanalonso1993 ➜ /workspaces/real_time_processing/spark_custom_image (main) $ ls
-Dockerfile  start-spark.sh
-@bryanalonso1993 ➜ /workspaces/real_time_processing/spark_custom_image (main) $ docker build -t apache-spark:v1 .
+@bryanalonso1993 ➜ /workspaces/real_time_processing (main) $ cd airflow_custom_image/
+@bryanalonso1993 ➜ /workspaces/real_time_processing/airflow_custom_image (main) $ ls
+Dockerfile  requirements.txt start.sh
+@bryanalonso1993 ➜ /workspaces/real_time_processing/airflow_custom_image (main) $ docker build -t apache-airflow:v1 .
 [+] Building 0.7s (12/12) FINISHED                                                                                   docker:default
- => [internal] load build definition from Dockerfile                                                                           0.0s
- => => transferring dockerfile: 1.44kB                                                                                         0.0s
- => [internal] load metadata for docker.io/library/openjdk:11.0.11-jre-slim-buster                                             0.2s
- => [internal] load .dockerignore                                                                                              0.1s
- => => transferring context: 2B                                                                                                0.0s
- => [builder 1/4] FROM docker.io/library/openjdk:11.0.11-jre-slim-buster@sha256:24de726604f496a8d34cc960f39c3f3d825ebba522d8b  0.0s
- => [internal] load build context                                                                                              0.0s
- => => transferring context: 36B                                                                                               0.0s
- => CACHED [builder 2/4] RUN apt-get update && apt-get install -y curl vim wget software-properties-common ssh net-tools ca-c  0.0s
- => CACHED [builder 3/4] RUN update-alternatives --install "/usr/bin/python" "python" "$(which python3)" 1                     0.0s
- => CACHED [builder 4/4] RUN wget --no-verbose -O apache-spark.tgz "https://dlcdn.apache.org/spark/spark-3.5.1/spark-3.5.1-bi  0.0s
- => CACHED [apache-spark 1/3] WORKDIR /opt/spark                                                                               0.0s
- => CACHED [apache-spark 2/3] RUN mkdir -p /opt/spark/logs && touch /opt/spark/logs/spark-master.out && touch /opt/spark/logs  0.0s
- => CACHED [apache-spark 3/3] COPY start-spark.sh /                                                                            0.0s
- => exporting to image                                                                                                         0.1s
- => => exporting layers                                                                                                        0.0s
- => => writing image sha256:f0643f0ab6a3bcc117f2a69c966670f322dcd515544817ddb1906c41eb3143c2                                   0.0s
- => => naming to docker.io/library/apache-spark:v1                                                                             0.0s
+                                                                       0.0s
 ```
 
 3) Desplegar la aplicación con docker compose.
