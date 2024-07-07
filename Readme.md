@@ -1,5 +1,7 @@
 #### Real time processing
 
+##### Requisitos Previos:
+
 1) Crear imagen customizada de Apache Spark
 
 ```
@@ -43,7 +45,7 @@ Dockerfile  start-spark.sh
  => => naming to docker.io/library/apache-spark:v1                                                                             0.0s
 ```
 
-3) Desplegar la aplicación con docker compose
+3) Desplegar la aplicación con docker compose.
 
 ```
 @bryanalonso1993 ➜ /workspaces/real_time_processing (main) $ docker compose up -d
@@ -67,7 +69,7 @@ WARN[0000] /workspaces/real_time_processing/docker-compose.yaml: `version` is ob
  ✔ Container ui-kafka            Started  
 ```
 
-4) En el contenedor de airflow creamos un usuario por rol Admin
+4) En el contenedor de airflow creamos un usuario con el rol Admin.
 
 ```
 @bryanalonso1993 ➜ /workspaces/real_time_processing (main) $ docker exec -it airflow-standalone bash
@@ -78,12 +80,23 @@ airflow@477716bfad36:/opt/airflow$ airflow users create --username bryan --first
 [2024-07-06T12:34:20.495-0500] {override.py:1516} INFO - Added user bryan
 User "bryan" created with role "Admin"
 airflow@477716bfad36:/opt/airflow$ 
-``
+```
 
-5) Ejecutar el DAG crear_tablas_sistema_ventas en airflow.
+5) Crear la conexión desde Airflow a la base de datos.
+
+<img title="Crear registro pelicula" alt="Alt text" src="./img/conexion_mysql_airflow.png">
 
 
-6) Crear el conector de Debezium
+6) Crear variable que determina la tabla a poblar.
+
+<img title="Crear registro pelicula" alt="Alt text" src="./img/crear_variable_airflow.png">
+
+
+7) Ejecutar el DAG crear_tablas_sistema_ventas en irflow. 
+
+<img title="Crear tabla sistema de ventas" alt="Alt text" src="./img/crear_tabla_sistema_ventas.png">
+
+8) Crear el conector de Debezium.
 
 ```
 @bryanalonso1993 ➜ /workspaces/real_time_processing (main) $ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" http://localhost:8083/connectors/ -d @register-mysql.json
@@ -96,4 +109,4 @@ Server: Jetty(9.4.52.v20230823)
 
 {"name":"mysql-connector","config":{"connector.class":"io.debezium.connector.mysql.MySqlConnector","tasks.max":"1","database.hostname":"mysql-container","database.port":"3306","database.user":"root","database.password":"Changeme123","database.server.id":"184054","database.server.name":"datapath","database.include.list":"datapath","schema.history.internal.kafka.bootstrap.servers":"kafka:9092","schema.history.internal.kafka.topic":"schema-changes.datapath","include.schema.changes":"true","topic.prefix":"oltp","name":"mysql-connector"},"tasks":[],"type":"source"}
 ```
-
+ 
