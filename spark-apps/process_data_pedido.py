@@ -5,6 +5,7 @@ from pyspark.sql import SparkSession
 from datetime import datetime
 
 # ./bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 /opt/spark-apps/process_data_pedido.py
+# ./bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 --jars /opt/spark-data/mysql-connector-j-8.4.0.jar  /opt/spark-apps/process_data_pedido.py
 
 # fecha de ejecucion
 date_now = datetime.now().strftime("%Y-%m-%d")
@@ -72,11 +73,8 @@ processed_df = df_values_pedido.select("after.*") \
     .groupBy(["region", "categoria"]) \
     .count().withColumnRenamed("count","cantidad")
 
-json_schema_ingest = StructType([
-    StructField("region", StringType()),
-    StructField("categoria", StringType()),
-    StructField("cantidad", IntegerType())
-])
+# Cantidad de pedidos por región y categoría
+print(processed_df.show())
 
 processed_df \
     .write \
