@@ -5,6 +5,7 @@ from pyspark.sql import SparkSession
 from datetime import datetime
 
 # ./bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 /opt/spark-apps/process_data_pedido.py
+# ./bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 --jars /opt/spark-data/mysql-connector-j-8.4.0.jar  /opt/spark-apps/process_data_pedido.py
 
 # fecha de ejecucion
 date_now = datetime.now().strftime("%Y-%m-%d")
@@ -12,7 +13,11 @@ date_now = datetime.now().strftime("%Y-%m-%d")
 print(f"Fecha de ejecucion { date_now }")
 
 # instancia de Spark
-spark = SparkSession.builder.appName("Time Series Procesor").getOrCreate()
+# .config("spark.jars", "/opt/spark-data/mariadb-java-client-3.3.0.jar") \
+spark = SparkSession.builder \
+        .appName("Procesar tablas transaccionales y generar las tablas OLAP") \
+        .config("spark.jars", "/opt/spark-data/mysql-connector-j-8.4.0.jar") \
+        .getOrCreate()
 
 # Subscribe multiple topics
 
@@ -60,12 +65,28 @@ json_schema = StructType([
     StructField("transaction", NullType())
 ])
 
-df_values = df.selectExpr("CAST(value AS STRING) AS json").select(from_json(col("json"), json_schema).alias("data")).select("data.*")
+df_values_pedido = df.selectExpr("CAST(value AS STRING) AS json"). \
+        select(from_json(col("json"), json_schema) \
+        .alias("data")).select("data.*")
 
-print("Agrupación por region")
+processed_df = df_values_pedido.select("after.*") \
+    .groupBy(["region", "categoria"]) \
+    .count().withColumnRenamed("count","cantidad")
 
-processed_df = df_values.select("after.*").groupBy("region").count()
-
+# Cantidad de pedidos por región y categoría
 print(processed_df.show())
 
+processed_df \
+    .write \
+    .jdbc(url="jdbc:mysql://mysql-container:3306/datapath", 
+        table="cantidad_pedidos_region",
+        mode="append", 
+        properties={ 
+            "user": "root", 
+            "password": "Changeme123", 
+            "driver": "com.mysql.cj.jdbc.Driver" 
+        }
+    )
+
+# stop proceso spark
 spark.stop()

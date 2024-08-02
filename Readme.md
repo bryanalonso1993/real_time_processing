@@ -75,7 +75,7 @@ airflow@477716bfad36:/opt/airflow$
 <img title="Crear registro pelicula" alt="Alt text" src="./img/crear_variable_airflow.png">
 
 
-7) Ejecutar el DAG crear_tablas_sistema_ventas en irflow. 
+7) Ejecutar el DAG crear_tablas_sistema_ventas en airflow. 
 
 <img title="Crear tabla sistema de ventas" alt="Alt text" src="./img/crear_tabla_sistema_ventas.png">
 
@@ -95,61 +95,91 @@ Server: Jetty(9.4.52.v20230823)
  
 ##### Prueba Funcional:
 
-9) Ejecutar DAG pobla la base de datos.
-
-* Producto
-<img title="Crear tabla sistema de ventas" alt="Alt text" src="./img/poblar_tabla_producto.png">
+9) Ejecutar DAG pobla la base de datos OLTP.
 
 * Pedido
+<img title="Crear tabla sistema de ventas" alt="Alt text" src="./img/poblar_tabla_producto.png">
+
+* Producto
 <img title="Crear tabla sistema de ventas" alt="Alt text" src="./img/poblar_tabla_pedido.png">
 
 10) Validar UI Kafka.
 
 <img title="Crear tabla sistema de ventas" alt="Alt text" src="./img/kafka_ui.png">
 
-11) Procesamiento en Spark
+11) Ejecutar DAG que crea la tabla OLAP.
+
+<img title="Crear tabla olap DAG" alt="Alt text" src="./img/crear_tabla_olap_dag.png">
+
+12) Procesamiento en Spark.
 
 ```
-    root@9360c8613bfb:/opt/spark# ./bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 /opt/spark-apps/process_data_pedido.py
-
-    24/07/07 11:49:57 INFO DAGScheduler: Got job 1 (showString at <unknown>:0) with 1 output partitions
-24/07/07 11:49:57 INFO DAGScheduler: Final stage: ResultStage 2 (showString at <unknown>:0)
-24/07/07 11:49:57 INFO DAGScheduler: Parents of final stage: List(ShuffleMapStage 1)
-24/07/07 11:49:57 INFO DAGScheduler: Missing parents: List()
-24/07/07 11:49:57 INFO DAGScheduler: Submitting ResultStage 2 (MapPartitionsRDD[13] at showString at <unknown>:0), which has no missing parents
-24/07/07 11:49:57 INFO MemoryStore: Block broadcast_1 stored as values in memory (estimated size 64.6 KiB, free 434.2 MiB)
-24/07/07 11:49:57 INFO MemoryStore: Block broadcast_1_piece0 stored as bytes in memory (estimated size 26.1 KiB, free 434.2 MiB)
-24/07/07 11:49:57 INFO BlockManagerInfo: Added broadcast_1_piece0 in memory on 9360c8613bfb:35729 (size: 26.1 KiB, free: 434.3 MiB)
-24/07/07 11:49:57 INFO SparkContext: Created broadcast 1 from broadcast at DAGScheduler.scala:1585
-24/07/07 11:49:57 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 2 (MapPartitionsRDD[13] at showString at <unknown>:0) (first 15 tasks are for partitions Vector(0))
-24/07/07 11:49:57 INFO TaskSchedulerImpl: Adding task set 2.0 with 1 tasks resource profile 0
-24/07/07 11:49:57 INFO TaskSetManager: Starting task 0.0 in stage 2.0 (TID 1) (9360c8613bfb, executor driver, partition 0, NODE_LOCAL, 9664 bytes) 
-24/07/07 11:49:57 INFO Executor: Running task 0.0 in stage 2.0 (TID 1)
-24/07/07 11:49:57 INFO ShuffleBlockFetcherIterator: Getting 1 (313.0 B) non-empty blocks including 1 (313.0 B) local and 0 (0.0 B) host-local and 0 (0.0 B) push-merged-local and 0 (0.0 B) remote blocks
-24/07/07 11:49:57 INFO ShuffleBlockFetcherIterator: Started 0 remote fetches in 21 ms
-24/07/07 11:49:57 INFO BlockManagerInfo: Removed broadcast_0_piece0 on 9360c8613bfb:35729 in memory (size: 25.5 KiB, free: 434.4 MiB)
-24/07/07 11:49:57 INFO CodeGenerator: Code generated in 43.612415 ms
-24/07/07 11:49:57 INFO Executor: Finished task 0.0 in stage 2.0 (TID 1). 5247 bytes result sent to driver
-24/07/07 11:49:57 INFO TaskSetManager: Finished task 0.0 in stage 2.0 (TID 1) in 317 ms on 9360c8613bfb (executor driver) (1/1)
-24/07/07 11:49:57 INFO DAGScheduler: ResultStage 2 (showString at <unknown>:0) finished in 0.368 s
-24/07/07 11:49:57 INFO DAGScheduler: Job 1 is finished. Cancelling potential speculative or zombie tasks for this job
-24/07/07 11:49:57 INFO TaskSchedulerImpl: Removed TaskSet 2.0, whose tasks have all completed, from pool 
-24/07/07 11:49:57 INFO TaskSchedulerImpl: Killing all running tasks in stage 2: Stage finished
-24/07/07 11:49:57 INFO DAGScheduler: Job 1 finished: showString at <unknown>:0, took 0.409657 s
-24/07/07 11:49:57 INFO CodeGenerator: Code generated in 23.220101 ms
-+-------+-----+
-| region|count|
-+-------+-----+
-| Africa| 2957|
-|Oceanía|  686|
-| Europa| 2700|
-|America| 5212|
-|   Asia| 3197|
-+-------+-----+
+    root@468d1e8acbe0:/opt/spark# ./bin/spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 --jars /opt/spark-data/mysql-connector-j-8.4.0.jar  /opt/spark-apps/process_data_pedido.py
+24/07/08 23:46:47 INFO TaskSchedulerImpl: Removed TaskSet 2.0, whose tasks have all completed, from pool 
+24/07/08 23:46:47 INFO DAGScheduler: ResultStage 2 (showString at <unknown>:0) finished in 0.179 s
+24/07/08 23:46:47 INFO DAGScheduler: Job 1 is finished. Cancelling potential speculative or zombie tasks for this job
+24/07/08 23:46:47 INFO TaskSchedulerImpl: Killing all running tasks in stage 2: Stage finished
+24/07/08 23:46:47 INFO DAGScheduler: Job 1 finished: showString at <unknown>:0, took 0.216191 s
+24/07/08 23:46:47 INFO CodeGenerator: Code generated in 7.824468 ms
++-------+-------------------+--------+
+| region|          categoria|cantidad|
++-------+-------------------+--------+
+| Africa|Material de oficina|    1825|
+| Europa|Material de oficina|    1616|
+|   Asia|Material de oficina|    1909|
+| Europa|         Mobiliario|     534|
+|America|Material de oficina|    3164|
+|   Asia|         Tecnología|     656|
+| Africa|         Mobiliario|     569|
+| Europa|         Tecnología|     550|
+|Oceanía|         Mobiliario|     152|
+|Oceanía|         Tecnología|     127|
+|   Asia|         Mobiliario|     632|
+|America|         Tecnología|    1053|
+|America|         Mobiliario|     995|
+| Africa|         Tecnología|     563|
+|Oceanía|Material de oficina|     407|
++-------+-------------------+--------+
 
 None
-24/07/07 11:49:57 INFO SparkContext: SparkContext is stopping with exitCode 0.
-24/07/07 11:49:57 INFO SparkUI: Stopped Spark web UI at http://9360c8613bfb:4040
-24/07/07 11:49:57 INFO MapOutputTrackerMasterEndpoint: MapOutputTrackerMasterEndpoint stopped!
-
+24/07/08 23:46:47 INFO BlockManagerInfo: Removed broadcast_0_piece0 on 468d1e8acbe0:37369 in memory (size: 26.7 KiB, free: 434.4 MiB)
+24/07/08 23:46:48 INFO AdminClientConfig: AdminClientConfig values: 
+        auto.include.jmx.reporter = true
+        bootstrap.servers = [kafka:9092]
+        client.dns.lookup = use_all_dns_ips
+        client.id = 
+        connections.max.idle.ms = 300000
+        default.api.timeout.ms = 60000
+        metadata.max.age.ms = 300000
+        metric.reporters = []
+        metrics.num.samples = 2
+        metrics.recording.level = INFO
+        metrics.sample.window.ms = 30000
+        receive.buffer.bytes = 65536
+        reconnect.backoff.max.ms = 1000
+        reconnect.backoff.ms = 50
+        request.timeout.ms = 30000
+        retries = 2147483647
+        retry.backoff.ms = 100
+        sasl.client.callback.handler.class = null
+        sasl.jaas.config = null
+        sasl.kerberos.kinit.cmd = /usr/bin/kinit
+        sasl.kerberos.min.time.before.relogin = 60000
+        sasl.kerberos.service.name = null
+        sasl.kerberos.ticket.renew.jitter = 0.05
+        sasl.kerberos.ticket.renew.window.factor = 0.8
+        sasl.login.callback.handler.class = null
+        sasl.login.class = null
+        sasl.login.connect.timeout.ms = null
+        sasl.login.read.timeout.ms = null
+        sasl.login.refresh.buffer.seconds = 300
+        sasl.login.refresh.min.period.seconds = 60
+        sasl.login.refresh.window.factor = 0.8
+        sasl.login.refresh.window.jitter = 0.05
+        sasl.login.retry.backoff.max.ms = 10000
+        sasl.login.retry.backoff.ms = 100
 ```
+13) Validar la tabla cantidad_pedidos_region.
+
+<img title="Crear tabla cantidad pedidos region" alt="Alt text" src="./img/olap_tabla_cantidad_pedidos.png">
+
